@@ -1,4 +1,7 @@
 {
+    "name": "gollumeo/php-oop",
+    "description": "A legacy PHP (>= 8.2) OOP boilerplate",
+    "version": "0.8",
     "autoload": {
         "psr-4": {
             "app\\": "app/"

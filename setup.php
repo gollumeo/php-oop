@@ -1,84 +1,90 @@
 #!/usr/bin/env php
 <?php
 
-function setupProject()
+require_once __DIR__ . '/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+
+class SetupCommand extends Command
 {
-    echo "Bienvenue dans le script de setup de votre projet PHP MVC.\n";
+    protected static $defaultName = 'setup';
 
-    // Renommer le dossier du projet
-    $currentDir = getcwd();
-    $projectName = basename($currentDir);
-    echo "Votre projet est nommé : $projectName\n";
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $helper = $this->getHelper('question');
 
-    // Initialisation de npm et installation de Vite
-    echo "Initialisation de npm et installation de Vite...\n";
-    exec("npm init -y");
-    exec("npm install vite");
+        $output->writeln("Welcome to your new PHP OOP & MVC project setup!");
 
-    // Choix du type de CSS
-    echo "Choisissez le type de CSS que vous souhaitez utiliser :\n";
-    echo "1. CSS natif\n";
-    echo "2. SCSS\n";
-    echo "3. Bootstrap\n";
-    echo "4. TailwindCSS\n";
-    echo "Entrez votre choix (1, 2, 3, 4) : ";
+        $currentDir = getcwd();
+        $projectName = basename($currentDir);
+        $output->writeln("Your project is named: $projectName");
 
-    $choice = trim(fgets(STDIN));
+        $output->writeln("Initialization & installation of Vite...");
+        exec("npm init -y");
+        exec("npm install vite");
 
-    // Création des dossiers si nécessaire
-    if (!is_dir('resources/css')) {
+        $question = new ChoiceQuestion(
+            'Please pick your CSS flavor (1 - Native CSS, 2 - SCSS, 3 - Bootstrap, 4 - TailwindCSS)',
+            ['1', '2', '3', '4'],
+            0
+        );
+        $question->setErrorMessage('%s is not a valid choice.');
+        $choice = $helper->ask($input, $output, $question);
+
+        // Remplacement du dossier resources/css
+        $this->replaceDirectory('resources/css');
         mkdir('resources/css', 0777, true);
-    }
-    if (!is_dir('resources/scss')) {
         mkdir('resources/scss', 0777, true);
-    }
 
-    switch ($choice) {
-        case 1:
-            echo "Installation de CSS natif...\n";
-            file_put_contents('resources/css/app.css', "/* Votre CSS ici */");
-            break;
-        case 2:
-            echo "Installation de SCSS...\n";
-            exec("npm install sass");
-            file_put_contents('resources/scss/app.scss', "// Votre SCSS ici");
-            break;
-        case 3:
-            echo "Installation de Bootstrap...\n";
-            exec("npm install bootstrap");
-            file_put_contents('resources/css/app.css', "@import 'bootstrap';");
-            break;
-        case 4:
-            echo "Installation de TailwindCSS...\n";
-            exec("npm install -D tailwindcss postcss autoprefixer");
-            exec("npx tailwindcss init -p");
-            file_put_contents('resources/css/app.css', "@tailwind base;\n@tailwind components;\n@tailwind utilities;");
-            file_put_contents('tailwind.config.js', str_replace(
-                'content: []',
-                'content: ["./app/Views/**/*.php", "./resources/js/**/*.js"]',
-                file_get_contents('tailwind.config.js')
-            ));
-            break;
-        default:
-            echo "Choix non valide. Par défaut, CSS natif sera utilisé.\n";
-            file_put_contents('resources/css/app.css', "/* Votre CSS ici */");
-            break;
-    }
+        switch ($choice) {
+            case '1':
+                $output->writeln("Native CSS initialization...");
+                file_put_contents('resources/css/app.css', "/* Your CSS goes here */");
+                break;
+            case '2':
+                $output->writeln("SCSS initialization...");
+                exec("npm install sass");
+                file_put_contents('resources/scss/app.scss', "// Your SCSS goes here");
+                break;
+            case '3':
+                $output->writeln("Bootstrap installation...");
+                exec("npm install bootstrap");
+                file_put_contents('resources/css/app.css', "@import 'bootstrap';");
+                break;
+            case '4':
+                $output->writeln("TailwindCSS installation...");
+                exec("npm install -D tailwindcss postcss autoprefixer");
+                exec("npx tailwindcss init -p");
+                file_put_contents('resources/css/app.css', "@tailwind base;\n@tailwind components;\n@tailwind utilities;");
+                file_put_contents('tailwind.config.js', str_replace(
+                    'content: []',
+                    'content: ["./app/Views/**/*.php", "./resources/js/**/*.js"]',
+                    file_get_contents('tailwind.config.js')
+                ));
+                break;
+            default:
+                $output->writeln("Invalid choice. Defaulting to Native CSS.");
+                file_put_contents('resources/css/app.css', "/* Your CSS goes here */");
+                break;
+        }
 
-    // Mise à jour du package.json pour Vite
-    $packageJson = json_decode(file_get_contents('package.json'), true);
-    $packageJson['scripts'] = [
-        'dev' => 'vite',
-        'build' => 'vite build'
-    ];
-    file_put_contents('package.json', json_encode($packageJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+        // Mise à jour du package.json pour Vite
+        $packageJson = json_decode(file_get_contents('package.json'), true);
+        $packageJson['scripts'] = [
+            'dev' => 'vite',
+            'build' => 'vite build'
+        ];
+        file_put_contents('package.json', json_encode($packageJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 
-    // Création des dossiers et fichiers nécessaires pour les vues
-    if (!is_dir('app/Views/partials')) {
-        mkdir('app/Views/partials', 0777, true);
-    }
+        // Création des dossiers et fichiers nécessaires pour les vues
+        if (!is_dir('app/Views/partials')) {
+            mkdir('app/Views/partials', 0777, true);
+        }
 
-    if (!file_exists('app/Views/partials/header.php')) {
         file_put_contents('app/Views/partials/header.php', <<<EOL
 <!doctype html>
 <html lang="en">
@@ -93,18 +99,39 @@ function setupProject()
 <body>
 EOL
         );
-    }
 
-    if (!file_exists('app/Views/partials/footer.php')) {
         file_put_contents('app/Views/partials/footer.php', <<<EOL
 </body>
 </html>
 EOL
         );
+
+        $output->writeln("Setup complete. You can now start working on your project.");
+
+        return Command::SUCCESS;
     }
 
-    echo "Setup terminé. Vous pouvez maintenant commencer à travailler sur votre projet.\n";
+    private function replaceDirectory($dir): void
+    {
+        if (is_dir($dir)) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            );
+
+            foreach ($files as $fileInfo) {
+                $todo = ($fileInfo->isDir() ? 'rmdir' : 'unlink');
+                $todo($fileInfo->getRealPath());
+            }
+            rmdir($dir);
+        }
+    }
 }
 
-// Lancement du script de setup
-setupProject();
+$application = new Application();
+$application->add(new SetupCommand());
+try {
+    $application->run();
+} catch (Exception $e) {
+    echo $e->getMessage();
+}

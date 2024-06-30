@@ -9,14 +9,15 @@
     },
     "scripts": {
         "post-create-project-cmd": [
-            "php -d variables_order=EGPCS -r \"putenv('COMPOSER_INTERACTIVE=1');\" && php setup.php"
+            "php setup.php setup"
         ]
     },
     "require": {
         "bramus/router": "^1.6",
         "vlucas/phpdotenv": "^5.6",
         "filp/whoops": "^2.15",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "symfony/console": "^6.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^6.2",

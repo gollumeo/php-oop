@@ -11,3 +11,5 @@ $dotenv->load();
 Route::init();
 
 require __DIR__ . '/../routes/web.php';
+
+Route::run();

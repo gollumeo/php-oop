@@ -23,7 +23,7 @@ class Route
      * @param string $uri The URI pattern that the route matches.
      * @param string|array $handler The handler that gets executed when the route is matched.
      */
-    public static function get(string $uri, string|array $handler): void
+    public static function get(string $uri, string|array|Closure $handler): void
     {
         self::$router->get($uri, self::handle($handler));
     }
@@ -78,7 +78,7 @@ class Route
      * @param array|string $handler The handler that gets executed when the route is matched.
      * @return Closure The closure that wraps the handler.
      */
-    private static function handle(array|string $handler): Closure
+    private static function handle(array|string|Closure $handler): Closure
     {
         return function (...$params) use ($handler) {
             if (is_array($handler)) {

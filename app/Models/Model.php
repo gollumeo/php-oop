@@ -19,8 +19,6 @@ abstract class Model
             self::initializeDatabase();
         }
 
-        // Initialise la table en utilisant la méthode abstraite
-        $this->table = $this->tableName();
     }
 
     private static function initializeDatabase(): void

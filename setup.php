@@ -15,7 +15,10 @@ function setupProject()
     echo "2. SCSS\n";
     echo "3. Bootstrap\n";
     echo "4. TailwindCSS\n";
-    $choice = readline("Entrez votre choix (1, 2, 3, 4) : ");
+    echo "Entrez votre choix (1, 2, 3, 4) : ";
+
+    $handle = fopen("php://stdin", "r");
+    $choice = trim(fgets($handle));
 
     // Initialisation de npm et installation de Vite
     echo "Initialisation de npm et installation de Vite...\n";
@@ -31,21 +34,21 @@ function setupProject()
     }
 
     switch ($choice) {
-        case 1:
+        case '1':
             echo "Installation de CSS natif...\n";
             file_put_contents('resources/css/app.css', "/* Votre CSS ici */");
             break;
-        case 2:
+        case '2':
             echo "Installation de SCSS...\n";
             exec("npm install sass");
             file_put_contents('resources/scss/app.scss', "// Votre SCSS ici");
             break;
-        case 3:
+        case '3':
             echo "Installation de Bootstrap...\n";
             exec("npm install bootstrap");
             file_put_contents('resources/css/app.css', "@import 'bootstrap';");
             break;
-        case 4:
+        case '4':
             echo "Installation de TailwindCSS...\n";
             exec("npm install -D tailwindcss postcss autoprefixer");
             exec("npx tailwindcss init -p");

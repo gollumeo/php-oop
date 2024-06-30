@@ -7,15 +7,19 @@
             "app\\": "app/"
         }
     },
+    "scripts": {
+        "post-create-project-cmd": [
+            "php setup.php"
+        ]
+    },
     "require": {
         "bramus/router": "^1.6",
         "vlucas/phpdotenv": "^5.6",
         "filp/whoops": "^2.15",
         "ext-pdo": "*"
     },
-    "scripts": {
-        "post-create-project-cmd": [
-            "php setup.php"
-        ]
+    "require-dev": {
+        "symfony/var-dumper": "^6.2",
+        "phpunit/phpunit": "^10.1"
     }
 }

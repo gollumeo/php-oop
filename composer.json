@@ -8,13 +8,7 @@
         }
     },
     "scripts": {
-        "post-create-project-cmd": [
-            "app\\Commands\\SetupCommand::launch"
-        ],
-        "post-update-cmd": [
-            "app\\Commands\\SetupCommand::launch"
-        ],
-        "post-install-cmd": [
+        "post-root-package-install": [
             "app\\Commands\\SetupCommand::launch"
         ]
     },

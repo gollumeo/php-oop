@@ -163,8 +163,17 @@ EOL
             });
             EOL;
 
-        file_put_contents('vite.config.js', $viteConfig);
-        $output->writeln("Created vite.config.js");
+        try {
+            $result = file_put_contents('vite.config.js', $viteConfig);
+            if ($result === false) {
+                throw new \RuntimeException("Failed to write to vite.config.js");
+            }
+            $output->writeln("Created vite.config.js");
+        } catch (\Exception $e) {
+            $output->writeln("<error>Error creating vite.config.js: " . $e->getMessage() . "</error>");
+            $output->writeln("Current working directory: " . getcwd());
+            $output->writeln("Is directory writable: " . (is_writable(getcwd()) ? 'Yes' : 'No'));
+        }
     }
 
     private function updateJsFile(OutputInterface $output): void

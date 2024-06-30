@@ -9,7 +9,7 @@
     },
     "scripts": {
         "post-create-project-cmd": [
-            "php setup.php setup"
+            "php setup.php"
         ]
     },
     "require": {

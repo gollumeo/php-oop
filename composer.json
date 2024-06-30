@@ -9,7 +9,7 @@
     },
     "scripts": {
         "post-create-project-cmd": [
-            "php setup.php"
+            "php -d variables_order=EGPCS -r \"putenv('COMPOSER_INTERACTIVE=1');\" && php setup.php"
         ]
     },
     "require": {

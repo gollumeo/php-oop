@@ -8,10 +8,10 @@ $whoops->pushHandler(new PrettyPageHandler);
 $whoops->register();
 
 /**
- * Génère une directive @vite() pour inclure les fichiers JavaScript et CSS.
+ * Generate the @vite() directive.
  *
- * @param array $files Tableau des chemins des fichiers à inclure.
- * @return string Directive @vite() générée.
+ * @param array $files Array of files to include.
+ * @return string The generated Vite directive.
  */
 function vite(array $files): string
 {

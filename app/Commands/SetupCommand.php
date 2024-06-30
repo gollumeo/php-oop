@@ -118,6 +118,9 @@ EOL
 EOL
         );
 
+        $this->createViteConfig($output);
+        $this->updateJsFile($output);
+
         $output->writeln("Setup complete. You can now start working on your project.");
 
         return Command::SUCCESS;
@@ -137,6 +140,48 @@ EOL
             }
             rmdir('resources/css');
         }
+    }
+
+    private function createViteConfig(OutputInterface $output): void
+    {
+        $viteConfig = <<<EOL
+            import { defineConfig } from 'vite';
+            
+            export default defineConfig({
+              plugins: [],
+              root: './resources',
+              build: {
+                outDir: '../public/build',
+                emptyOutDir: true,
+                manifest: true,
+                rollupOptions: {
+                  input: {
+                    app: './resources/js/app.js',
+                  },
+                },
+              },
+            });
+            EOL;
+
+        file_put_contents('vite.config.js', $viteConfig);
+        $output->writeln("Created vite.config.js");
+    }
+
+    private function updateJsFile(OutputInterface $output): void
+    {
+        $jsContent = <<<EOL
+            import '../css/app.css';
+            
+            // Your JavaScript code goes here
+            console.log('App loaded');
+            EOL;
+
+        if (!is_dir('resources/js')) {
+            mkdir('resources/js', 0777, true);
+        }
+
+        file_put_contents('resources/js/app.js', $jsContent);
+        $output->writeln("Updated resources/js/app.js to import CSS");
     }
 
     /**

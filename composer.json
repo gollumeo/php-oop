@@ -9,7 +9,13 @@
     },
     "scripts": {
         "post-create-project-cmd": [
-            "php setup.php"
+            "app\\Commands\\SetupCommand::launch"
+        ],
+        "post-update-cmd": [
+            "app\\Commands\\SetupCommand::launch"
+        ],
+        "post-install-cmd": [
+            "app\\Commands\\SetupCommand::launch"
         ]
     },
     "require": {

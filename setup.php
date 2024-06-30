@@ -1,8 +1,12 @@
-#!/usr/bin/env php bin/console
+#!/usr/bin/env php
 <?php
+
+namespace App\Commands;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+
+use Exception;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -126,12 +130,16 @@ EOL
             rmdir($dir);
         }
     }
+
+    /**
+     * @throws Exception
+     */
+    public function launch(): void
+    {
+        $application = new Application();
+        $application->add(new SetupCommand());
+        $application->run();
+    }
 }
 
-$application = new Application();
-$application->add(new SetupCommand());
-try {
-    $application->run();
-} catch (Exception $e) {
-    echo $e->getMessage();
-}
+

@@ -9,6 +9,8 @@ use RecursiveIteratorIterator;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -26,8 +28,6 @@ class SetupCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $helper = $this->getHelper('question');
-
         $output->writeln("Welcome to your new PHP OOP & MVC project setup!");
 
         $currentDir = getcwd();
@@ -38,6 +38,7 @@ class SetupCommand extends Command
         exec("npm init -y");
         exec("npm install vite");
 
+        $helper = new QuestionHelper();
         $question = new ChoiceQuestion(
             'Please pick your CSS flavor (1 - Native CSS, 2 - SCSS, 3 - Bootstrap, 4 - TailwindCSS)',
             ['1', '2', '3', '4'],
@@ -145,6 +146,17 @@ EOL
     public static function launch(): void
     {
         $command = new self();
-        $command->run(new ArrayInput([]), new ConsoleOutput());
+        $input = new ArrayInput([]);
+        $output = new ConsoleOutput();
+
+        // Create a new HelperSet and add it to the command
+        $helperSet = new HelperSet();
+        $command->setHelperSet($helperSet);
+
+        try {
+            $command->run($input, $output);
+        } catch (Exception $e) {
+            $output->writeln('<error>' . $e->getMessage() . '</error>');
+        }
     }
 }

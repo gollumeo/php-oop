@@ -9,6 +9,11 @@ function setupProject()
     $projectName = basename($currentDir);
     echo "Votre projet est nommé : $projectName\n";
 
+    // Initialisation de npm et installation de Vite
+    echo "Initialisation de npm et installation de Vite...\n";
+    exec("npm init -y");
+    exec("npm install vite");
+
     // Choix du type de CSS
     echo "Choisissez le type de CSS que vous souhaitez utiliser :\n";
     echo "1. CSS natif\n";
@@ -18,11 +23,6 @@ function setupProject()
     echo "Entrez votre choix (1, 2, 3, 4) : ";
 
     $choice = trim(fgets(STDIN));
-
-    // Initialisation de npm et installation de Vite
-    echo "Initialisation de npm et installation de Vite...\n";
-    exec("npm init -y");
-    exec("npm install vite");
 
     // Création des dossiers si nécessaire
     if (!is_dir('resources/css')) {

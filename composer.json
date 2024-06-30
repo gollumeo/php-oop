@@ -9,7 +9,7 @@
     },
     "scripts": {
         "post-create-project-cmd": [
-            "php setup.php"
+            "php bin/console setup -v"
         ]
     },
     "require": {

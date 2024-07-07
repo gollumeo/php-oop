@@ -44,7 +44,10 @@ class SetupCommand extends Command
             ], 1
         );
         $question->setErrorMessage('%s is not a valid choice.');
-        $choice = $helper->ask($input, $output, $question);
+        $choice = (int) $helper->ask($input, $output, $question);
+
+        dump($choice);
+        die;
 
         // Remplacement du dossier resources/css
         $this->replaceDirectory();

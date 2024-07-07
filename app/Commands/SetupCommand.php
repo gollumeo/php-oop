@@ -35,13 +35,9 @@ class SetupCommand extends Command
 
         $helper = new QuestionHelper();
         $question = new ChoiceQuestion(
-            'Please pick your CSS flavor [0-3]',
-            [
-                'Native CSS (0)',
-                'SCSS (1)',
-                'Bootstrap (2)',
-                'TailwindCSS (3)'
-            ], 0
+            'Please pick your CSS flavor (1 - Native CSS, 2 - SCSS, 3 - Bootstrap, 4 - TailwindCSS)',
+            ['1', '2', '3', '4'],
+            1
         );
         $question->setErrorMessage('%s is not a valid choice.');
         $choice = $helper->ask($input, $output, $question);
@@ -50,23 +46,22 @@ class SetupCommand extends Command
         mkdir('resources/css', 0777, true);
         mkdir('resources/scss', 0777, true);
 
-
         switch ($choice) {
-            case '0':
+            case '1':
                 $output->writeln("Native CSS initialization...");
                 file_put_contents('resources/css/app.css', "/* Your CSS goes here */");
                 break;
-            case '1':
+            case '2':
                 $output->writeln("SCSS initialization...");
                 exec("npm install sass");
                 file_put_contents('resources/scss/app.scss', "// Your SCSS goes here");
                 break;
-            case '2':
+            case '3':
                 $output->writeln("Bootstrap installation...");
                 exec("npm install bootstrap");
                 file_put_contents('resources/css/app.css', "@import 'bootstrap';");
                 break;
-            case '3':
+            case '4':
                 $output->writeln("TailwindCSS installation...");
                 exec("npm install -D tailwindcss postcss autoprefixer");
                 exec("npx tailwindcss init -p");

@@ -2,25 +2,26 @@
 
 namespace app\Views;
 
-abstract class View
+class View
 {
     protected string $header = 'partials/header.php';
     protected string $footer = 'partials/footer.php';
     protected string $title;
 
-    protected function render(string $view, array $data = []): void
+    public function render(string $view, array $data = [], $title = null): void
     {
+        $this->title = $title ?? null;
         $data['title'] = $this->title ?? null;
         extract($data);
 
-        if (file_exists(__DIR__ . "/../../Views/{$this->header}")) {
-            include __DIR__ . "/../../Views/{$this->header}";
+        if (file_exists(__DIR__ . "/{$this->header}")) {
+            include __DIR__ . "/{$this->header}";
         }
 
-        include __DIR__ . "/../../Views/$view.php";
+        include __DIR__ . "/$view.php";
 
-        if (file_exists(__DIR__ . "/../../Views/{$this->footer}")) {
-            include __DIR__ . "/../../Views/{$this->footer}";
+        if (file_exists(__DIR__ . "/{$this->footer}")) {
+            include __DIR__ . "/{$this->footer}";
         }
     }
 }

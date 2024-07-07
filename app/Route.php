@@ -7,7 +7,7 @@ use Closure;
 
 class Route
 {
-    private static Router $router;
+    public static Router $router;
 
     /**
      * Initializes the router.

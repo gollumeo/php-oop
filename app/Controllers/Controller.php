@@ -6,12 +6,10 @@ use app\Views\View;
 
 abstract class Controller
 {
-    protected View $view;
-
-    public function __construct(View $view)
+    public function view(string $view, array $data = [], $title = null): View
     {
-        $this->view = $view;
+        $viewInstance = new View();
+        $viewInstance->render($view, $data, $title);
+        return $viewInstance;
     }
-
-    abstract function index(): View;
 }

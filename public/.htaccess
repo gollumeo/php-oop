@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Redirect all requests to index.php if the file or directory doesn't exist
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+
+    # Handle requests for Vite HMR
+    RewriteCond %{HTTP:Upgrade} =websocket [NC]
+    RewriteRule /(.*)  ws://ratatata.test:5173/$1 [P,L]
+
+    # Proxy requests to Vite dev server for non-existing files
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(resources|@vite)/ http://ratatata.test:5173/$1 [P,L]
+</IfModule>

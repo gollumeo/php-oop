@@ -2,6 +2,8 @@
 
 namespace app\Models;
 
+use DateTime;
+use Exception;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -11,16 +13,29 @@ use ReflectionProperty;
 abstract class Model
 {
     protected static PDO $pdo;
-    protected string $table;
+    protected static string $table;
 
+    /**
+     * @throws Exception
+     */
     public function __construct()
     {
-        if (!isset(self::$pdo)) {
-            self::initializeDatabase();
-        }
-
+        static::getPDO();
     }
 
+    /**
+     * @throws Exception
+     */
+    private static function getPDO(): void
+    {
+        if (!isset(static::$pdo)) {
+            static::initializeDatabase();
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
     private static function initializeDatabase(): void
     {
         $host = $_ENV['DB_HOST'];
@@ -29,100 +44,148 @@ abstract class Model
         $password = $_ENV['DB_PASSWORD'];
 
         try {
-            self::$pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-            self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            static::$pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+            static::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
+            throw new Exception("Connection failed: " . $e->getMessage());
         }
     }
 
-    public function find(int $id): array
+    /**
+     * @throws Exception
+     */
+    public static function find(int $id): ?static
     {
-        $statement = self::$pdo->prepare("SELECT * FROM {$this->table} WHERE id = :id");
-        $statement->execute(['id' => $id]);
-        return $statement->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function findAll(): array
-    {
-        $statement = self::$pdo->prepare("SELECT * FROM {$this->table}");
+        static::getPDO();
+        $statement = static::$pdo->prepare("SELECT * FROM " . static::$table . " WHERE id = :id");
+        $statement->bindParam(':id', $id, PDO::PARAM_INT);
+        $statement->setFetchMode(PDO::FETCH_CLASS, static::class);
         $statement->execute();
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        $result = $statement->fetch();
+
+        if ($result && property_exists($result, 'last_updated')) {
+            $result->last_updated = new DateTime($result->last_updated);
+        }
+
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
     }
 
-    public function update(int $id, array $data): void
+    /**
+     * @throws Exception
+     */
+    public static function findAll(): array
     {
-        $this->validateRequiredFields($data, array_keys($data));
+        static::getPDO();
+        $statement = static::$pdo->prepare("SELECT * FROM " . static::$table);
+        $statement->execute();
+        return $statement->fetchAll(PDO::FETCH_ASSOC) ? : [];
+    }
 
-        $fields = '';
-        foreach (array_keys($data) as $key) {
-            $fields .= $key . ' = :' . $key . ', ';
-        }
-        $fields = rtrim($fields, ', ');
+    /**
+     * @throws Exception
+     */
+    public static function update(int $id, array $data): Model
+    {
+        static::getPDO();
+        self::validateRequiredFields($data, array_keys($data));
 
-        $statement = self::$pdo->prepare("UPDATE {$this->table} SET $fields WHERE id = :id");
+        $fields = implode(', ', array_map(fn ($key) => "$key = :$key", array_keys($data)));
+
+        $statement = static::$pdo->prepare("UPDATE " . static::$table . " SET $fields WHERE id = :id");
         $statement->execute(array_merge(['id' => $id], $data));
+
+        return self::getCreatedInstance($id);
     }
 
-    public function updateBy(string $column, array $data): void
+    /**
+     * @throws Exception
+     */
+    public static function updateBy(string $column, array $data): void
     {
-        $this->validateRequiredFields($data, array_keys($data));
+        static::getPDO();
+        self::validateRequiredFields($data, array_keys($data));
 
-        $fields = '';
-        foreach (array_keys($data) as $key) {
-            $fields .= $key . ' = :' . $key . ', ';
-        }
-        $fields = rtrim($fields, ', ');
+        $fields = implode(', ', array_map(fn ($key) => "$key = :$key", array_keys($data)));
 
-        $statement = self::$pdo->prepare("UPDATE {$this->table} SET $fields WHERE $column = :$column");
+        $statement = static::$pdo->prepare("UPDATE " . static::$table . " SET $fields WHERE $column = :$column");
         $statement->execute($data);
     }
 
-    public function create(): void
+    /**
+     * @throws Exception
+     */
+    public static function create(array $data): Model
     {
-        $this->validateRequiredFields($this->getModelAttributes(), array_keys($this->getModelAttributes()));
+        static::getPDO();
+        static::validateRequiredFields($data, array_keys($data));
 
-        $fields = '';
-        $placeholders = '';
-        foreach ($this->getModelAttributes() as $key => $value) {
-            $fields .= $key . ', ';
-            $placeholders .= ':' . $key . ', ';
-        }
-        $fields = rtrim($fields, ', ');
-        $placeholders = rtrim($placeholders, ', ');
+        $fields = implode(', ', array_keys($data));
+        $placeholders = implode(', ', array_map(fn ($key) => ":$key", array_keys($data)));
 
-        $statement = self::$pdo->prepare("INSERT INTO {$this->table} ($fields) VALUES ($placeholders)");
-        $statement->execute($this->getModelAttributes());
+        $statement = static::$pdo->prepare("INSERT INTO " . static::$table . " ($fields) VALUES ($placeholders)");
+        $statement->execute($data);
+
+        $id = static::$pdo->lastInsertId();
+        return static::getCreatedInstance($id);
     }
 
-    public function delete(int $id): void
+    /**
+     * @throws Exception
+     */
+    public static function delete(int $id): void
     {
-        $statement = self::$pdo->prepare("DELETE FROM {$this->table} WHERE id = :id");
+        static::getPDO();
+        $statement = static::$pdo->prepare("DELETE FROM " . static::$table . " WHERE id = :id");
         $statement->execute(['id' => $id]);
     }
 
-    protected function getModelAttributes(): array
+    protected static function getModelAttributes(): array
     {
-        $reflector = new ReflectionClass($this);
+        $reflector = new ReflectionClass(new static);
         $properties = $reflector->getProperties(ReflectionProperty::IS_PROTECTED);
 
         $attributes = [];
         foreach ($properties as $property) {
             $propertyName = $property->getName();
-            if ($propertyName !== 'table') {
-                $attributes[$propertyName] = $this->$propertyName;
+            if ($propertyName !== 'table' && isset(static::$$propertyName)) {
+                $attributes[$propertyName] = static::$$propertyName;
             }
         }
 
         return $attributes;
     }
 
-    protected function validateRequiredFields(array $data, array $requiredFields): void
+    protected static function validateRequiredFields(array $data, array $requiredFields): void
     {
         foreach ($requiredFields as $field) {
             if (empty($data[$field])) {
                 throw new InvalidArgumentException("Missing required field: $field");
             }
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private static function getCreatedInstance(int $id): Model
+    {
+        $instance = new static();
+        $data = $instance->find($id);
+
+        if ($data) {
+            foreach ($data as $key => $value) {
+                if ($key === 'last_updated') {
+                    $instance->$key = $value->format('Y-m-d H:i:s');
+                } else {
+                    $instance->$key = $value;
+                }
+            }
+        }
+
+        return $instance;
     }
 }

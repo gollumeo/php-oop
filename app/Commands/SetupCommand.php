@@ -117,7 +117,7 @@ EOL
 EOL
         );
 
-        $this->createViteConfig($output);
+        $this->createViteConfig($output, $choice);
         $this->updateJsFile($output);
         $this->createPhpReloadPlugin();
 
@@ -142,12 +142,39 @@ EOL
         }
     }
 
-    private function createViteConfig(OutputInterface $output): void
+    private function createViteConfig(OutputInterface $output, $choice): void
     {
-        $viteConfig = <<<EOL
-            import { defineConfig } from 'vite';
-            import phpReloadPlugin from './vite-php-reload-plugin.js';
+        $viteHeaders = '';
 
+        if ($choice == '1') {
+            $viteHeaders = <<<EOL
+            import { defineConfig } from 'vite';
+            import autoprefixer from 'autoprefixer';
+            import phpReloadPlugin from './vite-php-reload-plugin.js';
+            EOL;
+        }
+
+        if ($choice == '2') {
+            $viteHeaders = <<<EOL
+            import { defineConfig } from 'vite';
+            import { vite-plugin-sass } from 'vite-plugin-sass';
+            import autoprefixer from 'autoprefixer';
+            import phpReloadPlugin from './vite-php-reload-plugin.js';
+            EOL;
+        }
+
+        if ($choice == '4') {
+            $viteHeaders = <<<EOL
+            import {defineConfig} from 'vite';
+            import tailwindcss from 'tailwindcss';
+            import autoprefixer from 'autoprefixer';
+            import phpReloadPlugin from './vite-php-reload-plugin.js';
+            EOL;
+        }
+
+        $viteConfig = <<<EOL
+            
+            $viteHeaders
             export default defineConfig({
               plugins: [phpReloadPlugin()],
               root: './',

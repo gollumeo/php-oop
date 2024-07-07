@@ -65,6 +65,13 @@ Then, open your browser and visit `http://my-project.test`.
 
 Feel free to contribute to this project! You can also comment on the issues or create new ones foe next features or any issue to be solved!
 
+## Coming Soon(tm)
+
+[*] Actual doc on how to use/set up new data flow:
+    [*] setting up the model properties;
+    [*] handling requests and responses within the controller
+    [*] sending data from the controller to the view
+
 ## License
 
 This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

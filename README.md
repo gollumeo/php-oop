@@ -67,10 +67,10 @@ Feel free to contribute to this project! You can also comment on the issues or c
 
 ## Coming Soon(tm)
 
-[*] Actual doc on how to use/set up new data flow:
-    [*] setting up the model properties;
-    [*] handling requests and responses within the controller
-    [*] sending data from the controller to the view
+- Actual doc on how to use/set up new data flow:
+    - setting up the model properties;
+    - handling requests and responses within the controller
+    - sending data from the controller to the view
 
 ## License
 

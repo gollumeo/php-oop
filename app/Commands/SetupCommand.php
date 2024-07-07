@@ -45,13 +45,13 @@ class SetupCommand extends Command
         );
         $question->setErrorMessage('%s is not a valid choice.');
         $choice = (int) $helper->ask($input, $output, $question);
-
+        var_dump($choice);
+        exit;
         $this->replaceDirectory();
         mkdir('resources/css', 0777, true);
         mkdir('resources/scss', 0777, true);
 
-            var_dump($choice);
-            exit;
+
         switch ($choice) {
             case 1:
                 $output->writeln("Native CSS initialization...");

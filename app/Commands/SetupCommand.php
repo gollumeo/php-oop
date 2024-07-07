@@ -46,10 +46,6 @@ class SetupCommand extends Command
         $question->setErrorMessage('%s is not a valid choice.');
         $choice = (int) $helper->ask($input, $output, $question);
 
-        var_dump($choice);
-        die;
-
-        // Remplacement du dossier resources/css
         $this->replaceDirectory();
         mkdir('resources/css', 0777, true);
         mkdir('resources/scss', 0777, true);
@@ -86,7 +82,6 @@ class SetupCommand extends Command
                 break;
         }
 
-        // Mise à jour du package.json pour Vite
         $packageJson = json_decode(file_get_contents('package.json'), true);
         $packageJson['scripts'] = [
             'dev' => 'vite',
@@ -94,7 +89,6 @@ class SetupCommand extends Command
         ];
         file_put_contents('package.json', json_encode($packageJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 
-        // Création des dossiers et fichiers nécessaires pour les vues
         if (!is_dir('app/Views/partials')) {
             mkdir('app/Views/partials', 0777, true);
         }
@@ -256,7 +250,6 @@ EOL
         $input = new ArrayInput([]);
         $output = new ConsoleOutput();
 
-        // Create a new HelperSet and add it to the command
         $helperSet = new HelperSet();
         $command->setHelperSet($helperSet);
 

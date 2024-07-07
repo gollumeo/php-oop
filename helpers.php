@@ -15,18 +15,20 @@ $whoops->register();
  */
 function vite(array $files): string
 {
+    $isDev = $_ENV['APP_ENV'] === 'development';
+    $devServerUrl = 'http://ratatata.test:5173';
+
     $output = '';
 
-    foreach ($files as $file) {
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
-
-        switch ($extension) {
-            case 'js':
-                $output .= "<script type=\"module\" src=\"$file\"></script>\n";
-                break;
-            case 'css':
-                $output .= "<link rel=\"stylesheet\" href=\"$file\">\n";
-                break;
+    if ($isDev) {
+        $output = "<script type=\"module\" src=\"{$devServerUrl}/@vite/client\"></script>\n";
+        foreach ($files as $file) {
+            $output .= "<script type=\"module\" src=\"{$devServerUrl}/{$file}\"></script>\n";
+        }
+    } else {
+        $manifest = json_decode(file_get_contents(__DIR__ . '/public/build/manifest.json'), true);
+        foreach ($files as $file) {
+            $output .= "<script type=\"module\" src=\"/build/{$manifest[$file]['file']}\"></script>\n";
         }
     }
 

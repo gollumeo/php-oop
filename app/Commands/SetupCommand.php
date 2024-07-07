@@ -29,19 +29,19 @@ class SetupCommand extends Command
     {
         $output->writeln("Welcome to your new PHP OOP & MVC project setup!");
 
-        $currentDir = getcwd();
-        $projectName = basename($currentDir);
-        $output->writeln("Your project is named: $projectName");
-
         $output->writeln("Initialization & installation of Vite...");
         exec("npm init -y");
         exec("npm install vite");
 
         $helper = new QuestionHelper();
         $question = new ChoiceQuestion(
-            'Please pick your CSS flavor (1 - Native CSS, 2 - SCSS, 3 - Bootstrap, 4 - TailwindCSS)',
-            ['1', '2', '3', '4'],
-            1
+            'Please pick your CSS flavor [1]',
+            [
+                '1' => 'Native CSS',
+                '2' => 'SCSS',
+                '3' => 'Bootstrap',
+                '4' => 'TailwindCSS'
+            ], 1
         );
         $question->setErrorMessage('%s is not a valid choice.');
         $choice = $helper->ask($input, $output, $question);
@@ -119,6 +119,7 @@ EOL
 
         $this->createViteConfig($output);
         $this->updateJsFile($output);
+        $this->createPhpReloadPlugin();
 
         $output->writeln("Setup complete. You can now start working on your project.");
 
@@ -145,10 +146,12 @@ EOL
     {
         $viteConfig = <<<EOL
             import { defineConfig } from 'vite';
-            
+            import phpReloadPlugin from './vite-php-reload-plugin.js';
+
             export default defineConfig({
-              plugins: [],
-              root: './resources',
+              plugins: [phpReloadPlugin()],
+              root: './',
+              base: './',
               build: {
                 outDir: '../public/build',
                 emptyOutDir: true,
@@ -190,6 +193,27 @@ EOL
 
         file_put_contents('resources/js/app.js', $jsContent);
         $output->writeln("Updated resources/js/app.js to import CSS");
+    }
+
+    private function createPhpReloadPlugin(): void
+    {
+        $plugin = <<<EOL
+        export default function phpReloadPlugin() {
+        return {
+            name: 'php-reload-plugin',
+            handleHotUpdate({ file, server }) {
+                if (file.endsWith('.php')) {
+                    server.ws.send({
+                        type: 'full-reload',
+                        path: '*'
+                    });
+                }
+            }
+        }
+    }
+    EOL;
+
+        file_put_contents('vite-php-reload-plugin.js', $plugin);
     }
 
     /**

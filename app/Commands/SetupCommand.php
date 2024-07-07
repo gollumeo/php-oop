@@ -37,11 +37,11 @@ class SetupCommand extends Command
         $question = new ChoiceQuestion(
             'Please pick your CSS flavor [1]',
             [
-                1 => 'Native CSS',
-                2 => 'SCSS',
-                3 => 'Bootstrap',
-                4 => 'TailwindCSS'
-            ], 1
+                '1' => 'Native CSS',
+                '2' => 'SCSS',
+                '3' => 'Bootstrap',
+                '4' => 'TailwindCSS'
+            ], '1'
         );
         $question->setErrorMessage('%s is not a valid choice.');
         $choice = (int) $helper->ask($input, $output, $question);

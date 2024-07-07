@@ -59,7 +59,7 @@ If you are using Herd, you can run the following command:
 herd link
 ```
 
-Then, open your browser and visit `http://my-project.herd.test`.
+Then, open your browser and visit `http://my-project.test`.
 
 ## Contributing
 

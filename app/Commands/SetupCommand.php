@@ -165,6 +165,8 @@ EOL
             EOL;
         }
 
+        $appUrl = $_ENV['APP_URL'] ?? 'localhost';
+
         $viteConfig = <<<EOL
             
             $viteHeaders
@@ -182,17 +184,37 @@ EOL
                   },
                 },
               },
+              server: {
+                host: $appUrl,
+                port: 5173,
+                hmr: {
+                  host: $appUrl,
+                  port: 5173
+                },
+                watch: {
+                  usePolling: true,
+                  include: ['**/*.php', '**/*.js', '**/*.css']
+                },
+              },
+              css: {
+                postcss: {
+                    plugins: [
+                        tailwindcss,
+                        autoprefixer,
+                     ],
+                },
+            },
             });
             EOL;
 
         try {
-            $result = file_put_contents('vite.config.js', $viteConfig);
+            $result = file_put_contents('vite.config.mjs', $viteConfig);
             if ($result === false) {
-                throw new \RuntimeException("Failed to write to vite.config.js");
+                throw new \RuntimeException("Failed to write to vite.config.mjs");
             }
-            $output->writeln("Created vite.config.js");
+            $output->writeln("Created vite.config.mjs");
         } catch (\Exception $e) {
-            $output->writeln("<error>Error creating vite.config.js: " . $e->getMessage() . "</error>");
+            $output->writeln("<error>Error creating vite.config.mjs: " . $e->getMessage() . "</error>");
             $output->writeln("Current working directory: " . getcwd());
             $output->writeln("Is directory writable: " . (is_writable(getcwd()) ? 'Yes' : 'No'));
         }

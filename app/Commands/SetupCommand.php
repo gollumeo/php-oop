@@ -50,6 +50,8 @@ class SetupCommand extends Command
         mkdir('resources/css', 0777, true);
         mkdir('resources/scss', 0777, true);
 
+            var_dump($choice);
+            exit;
         switch ($choice) {
             case 1:
                 $output->writeln("Native CSS initialization...");

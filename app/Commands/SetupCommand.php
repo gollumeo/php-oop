@@ -53,21 +53,21 @@ class SetupCommand extends Command
 
 
         switch ($choice) {
-            case 1:
+            case 0:
                 $output->writeln("Native CSS initialization...");
                 file_put_contents('resources/css/app.css', "/* Your CSS goes here */");
                 break;
-            case 2:
+            case 1:
                 $output->writeln("SCSS initialization...");
                 exec("npm install sass");
                 file_put_contents('resources/scss/app.scss', "// Your SCSS goes here");
                 break;
-            case 3:
+            case 2:
                 $output->writeln("Bootstrap installation...");
                 exec("npm install bootstrap");
                 file_put_contents('resources/css/app.css', "@import 'bootstrap';");
                 break;
-            case 4:
+            case 3:
                 $output->writeln("TailwindCSS installation...");
                 exec("npm install -D tailwindcss postcss autoprefixer");
                 exec("npx tailwindcss init -p");

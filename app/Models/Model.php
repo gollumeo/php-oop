@@ -81,8 +81,9 @@ abstract class Model
     {
         static::getPDO();
         $statement = static::$pdo->prepare("SELECT * FROM " . static::$table);
+        $statement->setFetchMode(PDO::FETCH_CLASS, static::class);
         $statement->execute();
-        return $statement->fetchAll(PDO::FETCH_ASSOC) ? : [];
+        return $statement->fetchAll() ? : [];
     }
 
     /**
